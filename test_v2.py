@@ -613,6 +613,8 @@ if __name__ == "__main__":
             tmp[k][1] = pa.rows[i][j + 1]
             k += 1
         pa.arr_piece.append(tmp)
+    print("\n*arr_piece*")
+    print("\n".join(map(str, pa.arr_piece)))
     for i in range(len(pa.arr_piece)):
         tmp = [[0] * 2 for i in [1] * len(pa.arr_piece[i])]
         rand1 = random.randint(-15, 15)
@@ -621,7 +623,9 @@ if __name__ == "__main__":
             tmp[k][0] = pa.arr_piece[i][k][0] + rand1
             tmp[k][1] = pa.arr_piece[i][k][1] + rand2
         pa.poly_row.append(tmp)
-    print("poly_row", pa.poly_row)
+    print("\n*poly_row*")
+    print("\n".join(map(str, pa.poly_row)))
+    print("\n")
     nagasa = 0
     p_num = len(pa.poly_row)
     p_count = 0
@@ -705,28 +709,6 @@ if __name__ == "__main__":
                 pa.False_list = []
                 disappear_list.append(exclusion_list)
                 exclusion_list = []
-            else:
-                for i in range(len(pa.poly_row)):
-                    # pa.poly_row = [[0] * 2 for i in [1] * len(pa.poly_row[i])]
-                    # s = int(r * (1 - (p_count / p_num)))
-                    # s_ = -1 * s
-                    # print("s = ", s)
-                    rand1 = random.randint(-6, 6)
-                    rand2 = random.randint(-6, 6)
-                    for k in range(0, len(pa.poly_row[i])):
-                        pa.poly_row[i][k][0] = pa.poly_row[i][k][0] + rand1
-                        pa.poly_row[i][k][1] = pa.poly_row[i][k][1] + rand2
-        else:
-            for i in range(len(pa.poly_row)):
-                # pa.poly_row = [[0] * 2 for i in [1] * len(pa.poly_row[i])]
-                # s = int(r * (1 - (p_count / p_num)))
-                # s_ = -1 * s
-                # print("s = ", s)
-                rand1 = random.randint(-6, 6)
-                rand2 = random.randint(-6, 6)
-                for k in range(0, len(pa.poly_row[i])):
-                    pa.poly_row[i][k][0] = pa.poly_row[i][k][0] + rand1
-                    pa.poly_row[i][k][1] = pa.poly_row[i][k][1] + rand2
         print("False_list", pa.False_list)
         print("<poly_row>", pa.poly_row)
 
@@ -742,6 +724,12 @@ if __name__ == "__main__":
         print("\n".join(map(str, pa.poly_row)))
         print("\n")
 
+        for i in range(len(pa.poly_row)):
+            randx = random.randint(-15, 15)
+            randy = random.randint(-15, 15)
+            for j in range(len(pa.poly_row[i])):
+                pa.poly_row[i][j][0] += randx
+                pa.poly_row[i][j][1] += randy
         if len(pa.poly_row) == 1:
             nagasa = loop
 
