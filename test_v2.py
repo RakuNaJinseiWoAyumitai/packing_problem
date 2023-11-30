@@ -52,7 +52,7 @@ class paking_program:
                     if self.intersection(p1[i], p1[i + 1], p2[j], p2[j + 1]):
                         flag = False
         if flag:
-            print("flag=True1")
+            # print("flag=True1")
             # if (self.calc_area(self.Tolerance(p1.copy(), p2.copy()))) >= (
             #         self.calc_area(p1.copy()) + self.calc_area(p2.copy())):
             #     print("flag=TRUE")
@@ -64,7 +64,7 @@ class paking_program:
             # print(self.calc_area(self.Tolerance(p1.copy(),p2.copy())),self.calc_area(p1.copy()),self.calc_area(p2.copy()))
             if (self.calc_area(self.Tolerance(p1.copy(), p2.copy()))) >= (
                     self.calc_area(p1.copy()) + self.calc_area(p2.copy())):
-                print("flag=TRUE2")
+                # print("flag=TRUE2")
                 return True
             return False
 
@@ -621,6 +621,7 @@ if __name__ == "__main__":
             tmp[k][0] = pa.arr_piece[i][k][0] + rand1
             tmp[k][1] = pa.arr_piece[i][k][1] + rand2
         pa.poly_row.append(tmp)
+    print("poly_row", pa.poly_row)
     nagasa = 0
     p_num = len(pa.poly_row)
     p_count = 0
@@ -656,7 +657,7 @@ if __name__ == "__main__":
                 if new_piece == False:
                     # pa.False_list.append(comb[0][3]) #いるかわからん
                     # print("False_list", pa.False_list)
-                    print("fail1")
+                    # print("fail1")
                     flag = False
                 else:
                     print("piece1,piece2 = ", comb[0][1][0], comb[0][1][1])
@@ -665,7 +666,7 @@ if __name__ == "__main__":
                     exclusion_list.append(comb[0][1][1])
                     add_list.append(new_piece)
                     append_list.append(new_piece)
-                    print("sucess1")
+                    # print("sucess1")
                     flag = True
             else:
                 for i in range(tmp-1):  # poly_rowはcollision_listに書き換える
@@ -673,7 +674,7 @@ if __name__ == "__main__":
                     if new_piece == False:
                         # pa.False_list.append(comb[i][3]) # いるかわからん
                         # print("False_list", pa.False_list)
-                        print("fail2")
+                        # print("fail2")
                         flag = False
                     else:
                         print("new_piece", new_piece)
@@ -682,12 +683,12 @@ if __name__ == "__main__":
                         exclusion_list.append(comb[i][1][1])
                         add_list.append(new_piece)
                         append_list.append(new_piece)
-                        print("sucess2")
+                        # print("sucess2")
                         flag = True
             if flag:
                 exclusion_list = sorted(exclusion_list, reverse=True)
                 print("exclusion_list", exclusion_list)
-                print("poly_row", pa.poly_row)
+                # print("poly_row", pa.poly_row)
                 for i in range(len(exclusion_list)):
                     for j in range(len(pa.poly_row)):
                         if pa.poly_row[j] not in exclusion_list:
@@ -700,7 +701,7 @@ if __name__ == "__main__":
                 print("addlist", add_list)
                 print("new_list", new_list)
                 pa.poly_row = new_list
-                print("poly_row", pa.poly_row)
+                # print("poly_row", pa.poly_row)
                 pa.False_list = []
                 disappear_list.append(exclusion_list)
                 exclusion_list = []
@@ -727,6 +728,19 @@ if __name__ == "__main__":
                     pa.poly_row[i][k][0] = pa.poly_row[i][k][0] + rand1
                     pa.poly_row[i][k][1] = pa.poly_row[i][k][1] + rand2
         print("False_list", pa.False_list)
+        print("<poly_row>", pa.poly_row)
+
+        for i in range(len(pa.poly_row)):
+            randx = random.randint(-5, 5)
+            randy = random.randint(-5, 5)
+            dx = randx - pa.poly_row[i][0][0]
+            dy = randy - pa.poly_row[i][0][1]
+            for j in range(len(pa.poly_row[i])):
+                pa.poly_row[i][j][0] += dx
+                pa.poly_row[i][j][1] += dy
+        print("\n**poly_row**")
+        print("\n".join(map(str, pa.poly_row)))
+        print("\n")
 
         if len(pa.poly_row) == 1:
             nagasa = loop
