@@ -111,6 +111,7 @@ class paking_program:
         p2_info = self.degree_liner_set(p2)
         score = []
         max_score = 0
+        candidateComb = []
         comb = []
 
         for i in range(len(p1_info)):
@@ -161,81 +162,90 @@ class paking_program:
 
                 point = point1 * point2
                 # print(point)
+                count = 0
                 if max_score < point:
+                    candidateComb = []
                     max_score = point
-                    comb = [int(i), int(j)]
+                    candidateComb.append([int(i), int(j)])
                     # print("scoreProces", comb, max_score)
+                elif max_score == point:
+                    candidateComb.append([int(i), int(j)])
 
-        # print("comb, max_score", comb, max_score)
+        if len(candidateComb) != 1:
+            comb = random.choice(candidateComb)
+        else:
+            # print("[1]candidateComb:", candidateComb)
+            comb = candidateComb[0]
+
+        print("comb, max_score :", comb, max_score)
         return comb, max_score
 
     #移動前と移動後のピースの面積に変化があるか調べる
     def piece_check(self, pp, mp):  #pp：移動前のピース，mp：移動後のピース
         pp_area = self.calc_area(pp)
         mp_area = self.calc_area(mp)
-        #移動後のピースの面積が大きい場合False
+        #移動後のピースの面積が異なる場合False
         if mp_area != pp_area:
             return False
         else:
             return True
 
     def piece_move(self, piece, code):
+        print("code = ", code)
         p1 = piece[0]
         p2 = piece[1]
         p2_copy = copy.deepcopy(piece[1])
         a = p1[code[0]]
         b = p2[code[1]]
-        if a[0] < b[0]:
-            delta_x = b[0] - a[0]  # 0:x　1:y
-            delta_y = b[1] - a[1]
-            for i in range(len(p2)):
-                p2[i][0] -= delta_x
-                p2[i][1] -= delta_y
-        else:
-            delta_x = a[0] - b[0]
-            delta_y = a[1] - b[1]
-            for i in range(len(p2)):
-                p2[i][0] += delta_x
-                p2[i][1] += delta_y
+        dx = a[0] - b[0]
+        dy = a[1] - b[1]
+        for i in range(len(p2)):
+            p2[i][0] += dx
+            p2[i][1] += dy
 
-        flag = False
-        reverseFlag = ["normal", "x", "y"]
+        flag = True
+        reverseFlag = ["normal", "reverse"]
         degree = [0, 90, 180, 270]
+        count = 0
         if self.InputCheck(p1.copy(), p2.copy()) != True:
             for i in range(len(reverseFlag)):
                 rev_p2 = self.reversePiece(p2.copy(), reverseFlag[i], a)
                 for j in range(len(degree)):
                     p = self.rotate_cie(rev_p2.copy(), degree[j], a)
                     for k in range(len(p)):
-                        if p1 in p[k]:
-                            flag = True
-                            break
+                        if p[k] in p1:
+                            count += 1
+                    print("C,F,D,IP = ", count, reverseFlag[i], degree[j], self.InputCheck(p1.copy(), p.copy()))
+                    print("**p1**", p1)
+                    print("**p2**", p)
+                    if count == len(p):
+                        print("重なっている")
+                        flag = False
+                    count = 0
                     if self.InputCheck(p1.copy(), p.copy()) == True and flag:
-                        if self.piece_check(p2_copy, p2.copy):
+                        if self.piece_check(p2_copy, p2.copy()):
+                            print("**^^**")
                             return self.Tolerance(p1.copy(), p.copy())
                         else:
-                            print("「変形」")
+                            print("**「変形」**")
 
             return False
         else:
             if self.piece_check(p2_copy, p2.copy()):
+                print("--^^--")
                 return self.Tolerance(p1, p2.copy())
             else:
-                print("「変形」")
+                print("--「変形」--")
                 return False
 
     def reversePiece(self, piece , flag, refV):  #頂点refVを基準にして反転
         x = refV[0]
         y = refV[1]
 
-        if flag == "x":
+        if flag == "reverse":
             for i in range(len(piece)):
                 dx = x - piece[i][0]
                 piece[i][0] = x + dx
-        elif flag == "y":
-            for i in range(len(piece)):
-                dy = y - piece[i][1]
-                piece[i][1] = y + dy
         return piece
 
     #スコアが高い順にリストを生成
@@ -243,27 +253,32 @@ class paking_program:
         score_list = []
         totalScore = 0
         count = 0
+        sfList = []
         for i in range(len(result)):
             comb, score = self.search_func(array[result[i][0]], array[result[i][1]])
             totalScore += score
             count += 1
+            token = [comb, score]
+            sfList.append(token)
 
         Threshold = float(totalScore / count)   #閾値
         print("閾値 = ", Threshold)
         for i in range(len(result)):
             piece = [array[result[i][0]], array[result[i][1]]]
-            comb, score = self.search_func(array[result[i][0]], array[result[i][1]])
+            # comb, score = self.search_func(array[result[i][0]], array[result[i][1]])
+            comb = sfList[i][0]
+            score = sfList[i][1]
             if score >= Threshold:
                 combination = [result[i][0], result[i][1]]
                 list = [score, piece, comb, combination]
                 score_list.append(list)  #score_list=[スコア, [p1, p2], [p1の頂点番号, p2の頂点番号], ピースの組み合わせ]
 
-        sorted_score_list = sorted(score_list, reverse=True)
+        # sorted_score_list = sorted(score_list, reverse=True)
         # print("test_sortedScoreList↓")
         # pp.pprint(sorted_score_list, width=50)
         print("ペア数", len(score_list))
-        print(sorted_score_list)
-        return len(sorted_score_list), sorted_score_list
+        print(score_list)
+        return len(score_list), score_list
 
     #ピースの組み合わせを生成
     def piece_catch(self, area_num):
@@ -318,6 +333,7 @@ class paking_program:
         area = 0
         if p1 == False:
             return area
+        # print("p1", p1)
         for i in range(len(p1)):
             if i == (len(p1) - 1):
                 area += (p1[i][0] - p1[0][0]) * (p1[i][1] + p1[0][1])
@@ -730,6 +746,7 @@ if __name__ == "__main__":
             for j in range(len(pa.poly_row[i])):
                 pa.poly_row[i][j][0] += randx
                 pa.poly_row[i][j][1] += randy
+        #ピースが1つに統合されたら処理終了
         if len(pa.poly_row) == 1:
             nagasa = loop
 
@@ -740,6 +757,9 @@ if __name__ == "__main__":
             pa.poly_row[i][k][0] = pa.poly_row[i][k][0] + rand1
             pa.poly_row[i][k][1] = pa.poly_row[i][k][1] + rand2
         ax.add_patch(patches.Polygon(pa.poly_row[i], color=pa.colors[5], fill=False, linewidth=2))
+    print("---poly_row---")
+    print("\n".join(map(str, pa.poly_row)))
+    print("\n")
 
     plt.gca().spines['right'].set_visible(False)
     plt.gca().spines['top'].set_visible(False)
@@ -749,7 +769,7 @@ if __name__ == "__main__":
                     right=False, top=False)
 
     ax.autoscale()
-    print("append_list", append_list)
-    print("disappear_list", disappear_list)
-    print("結合した数, ピース数", p_count, len(pa.poly_row))
+    print("append_list:", append_list)
+    print("disappear_list:", disappear_list)
+    print("結合した数, ピース数 : ", p_count, len(pa.poly_row))
     plt.show()
