@@ -177,7 +177,7 @@ class paking_program:
             # print("[1]candidateComb:", candidateComb)
             comb = candidateComb[0]
 
-        print("comb, max_score :", comb, max_score)
+        # print("comb, max_score :", comb, max_score)
         return comb, max_score
 
     #移動前と移動後のピースの面積に変化があるか調べる
@@ -191,7 +191,7 @@ class paking_program:
             return True
 
     def piece_move(self, piece, code):
-        print("code = ", code)
+        # print("code = ", code)
         p1 = piece[0]
         p2 = piece[1]
         p2_copy = copy.deepcopy(piece[1])
@@ -215,17 +215,20 @@ class paking_program:
                     for k in range(len(p)):
                         if p[k] in p1:
                             count += 1
-                    print("C,F,D,IP = ", count, reverseFlag[i], degree[j], self.InputCheck(p1.copy(), p.copy()))
-                    print("**p1**", p1)
-                    print("**p2**", p)
+                    # print("C,F,D,IP = ", count, reverseFlag[i], degree[j], self.InputCheck(p1.copy(), p.copy()))
+                    # print("**p1**", p1)
+                    # print("**p2**", p)
                     if count == len(p):
                         print("重なっている")
                         flag = False
                     count = 0
                     if self.InputCheck(p1.copy(), p.copy()) == True and flag:
                         if self.piece_check(p2_copy, p2.copy()):
-                            print("**^^**")
-                            return self.Tolerance(p1.copy(), p.copy())
+                            np = self.Tolerance(p1.copy(), p.copy())
+                            if np != False:
+                                if self.calc_check(p1.copy(), p.copy(), np.copy()):
+                                    print("**^^**")
+                                    return self.Tolerance(p1.copy(), p.copy())
                         else:
                             print("**「変形」**")
 
@@ -237,6 +240,16 @@ class paking_program:
             else:
                 print("--「変形」--")
                 return False
+
+    def calc_check(self, p1, p2, np):   #新しいピースの面積を調べる
+        pp_area = self.calc_area(p1) + self.calc_area(p2)
+        np_area = self.calc_area(np)
+
+        if pp_area <= np_area:
+            if pp_area * 1.3 >= np_area:
+                return True
+        else:
+            return False
 
     def reversePiece(self, piece , flag, refV):  #頂点refVを基準にして反転
         x = refV[0]
@@ -608,6 +621,17 @@ class paking_program:
             return False
         return True
 
+    def allPiece_check(self, preRow, poly_row): #移動前後のピースの面積が変化していないか調べる
+        flag = True
+        count = 1
+        for i in range(len(preRow)):
+            if self.piece_check(preRow[i], poly_row[i]) != True:
+                flag = False
+                print('移動失敗' +str(count) + '\n移動前:' + str(preRow[i]) + '\n移動後:' + str(poly_row[i]))
+                poly_row[i] = preRow[i]
+                count += 1
+        return flag, poly_row
+
 if __name__ == "__main__":
     pa = paking_program()
     size = 8.0
@@ -631,6 +655,7 @@ if __name__ == "__main__":
         pa.arr_piece.append(tmp)
     print("\n*arr_piece*")
     print("\n".join(map(str, pa.arr_piece)))
+    pa.piece_data_backup = pa.arr_piece #移動前のピースデータを保存
     for i in range(len(pa.arr_piece)):
         tmp = [[0] * 2 for i in [1] * len(pa.arr_piece[i])]
         rand1 = random.randint(-15, 15)
@@ -639,12 +664,16 @@ if __name__ == "__main__":
             tmp[k][0] = pa.arr_piece[i][k][0] + rand1
             tmp[k][1] = pa.arr_piece[i][k][1] + rand2
         pa.poly_row.append(tmp)
+    checkFlag, pa.poly_row = pa.allPiece_check(pa.piece_data_backup, pa.poly_row)
+    print("checkFlag :", checkFlag)
     print("\n*poly_row*")
     print("\n".join(map(str, pa.poly_row)))
     print("\n")
     nagasa = 0
     p_num = len(pa.poly_row)
-    p_count = 0
+    p_count = 0 #ピースが統合した数
+    pa.piece_data_backup = []
+    checkFlag = True
     # 統合
     loop = 10   #ループの回数
     while nagasa != loop:  # ループ回数管理
@@ -728,28 +757,25 @@ if __name__ == "__main__":
         print("False_list", pa.False_list)
         print("<poly_row>", pa.poly_row)
 
+        pa.piece_data_backup = pa.poly_row
         for i in range(len(pa.poly_row)):
-            randx = random.randint(-5, 5)
-            randy = random.randint(-5, 5)
+            randx = random.randint(-8, 8)
+            randy = random.randint(-8, 8)
             dx = randx - pa.poly_row[i][0][0]
             dy = randy - pa.poly_row[i][0][1]
             for j in range(len(pa.poly_row[i])):
                 pa.poly_row[i][j][0] += dx
                 pa.poly_row[i][j][1] += dy
+        checkFlag, pa.poly_row = pa.allPiece_check(pa.piece_data_backup, pa.poly_row)
+        print("checkFlag :", checkFlag)
         print("\n**poly_row**")
         print("\n".join(map(str, pa.poly_row)))
         print("\n")
-
-        for i in range(len(pa.poly_row)):
-            randx = random.randint(-15, 15)
-            randy = random.randint(-15, 15)
-            for j in range(len(pa.poly_row[i])):
-                pa.poly_row[i][j][0] += randx
-                pa.poly_row[i][j][1] += randy
         #ピースが1つに統合されたら処理終了
         if len(pa.poly_row) == 1:
             nagasa = loop
 
+    pa.piece_data_backup = pa.poly_row
     for i in range(len(pa.poly_row)):
         rand1 = random.randint(-20, 20)
         rand2 = random.randint(-20, 20)
@@ -757,6 +783,8 @@ if __name__ == "__main__":
             pa.poly_row[i][k][0] = pa.poly_row[i][k][0] + rand1
             pa.poly_row[i][k][1] = pa.poly_row[i][k][1] + rand2
         ax.add_patch(patches.Polygon(pa.poly_row[i], color=pa.colors[5], fill=False, linewidth=2))
+    checkFlag, pa.poly_row = pa.allPiece_check(pa.piece_data_backup, pa.poly_row)
+    print("checkFlag :", checkFlag)
     print("---poly_row---")
     print("\n".join(map(str, pa.poly_row)))
     print("\n")
