@@ -12,7 +12,7 @@ class paking_program:
         # csvファイルを指定
         self.MyPath = 'E:\Reserch/programs/jakobs1.csv'
         # self.MyPath = 'E:\Reserch/programs/sample1.csv'
-        # self.MyPath = 'E:\Reserch/programs/ex7.csv'
+        # self.MyPath = 'E:\Reserch/programs/ex2.csv'
         self.piece_collision = [False, False, False, False]
         self.piece_MinMax = [[10000, 0, 10000, 0], [10000, 0, 10000, 0], [10000, 0, 10000, 0], [10000, 0, 10000, 0]]
         self.rows = []
@@ -223,12 +223,12 @@ class paking_program:
                         flag = False
                     count = 0
                     if self.InputCheck(p1.copy(), p.copy()) == True and flag:
-                        if self.piece_check(p2_copy, p2.copy()):
+                        if self.piece_check(p2_copy, p.copy()):
                             np = self.Tolerance(p1.copy(), p.copy())
                             if np != False:
                                 if self.calc_check(p1.copy(), p.copy(), np.copy()):
                                     print("**^^**")
-                                    return self.Tolerance(p1.copy(), p.copy())
+                                    return np
                         else:
                             print("**「変形」**")
 
@@ -236,7 +236,12 @@ class paking_program:
         else:
             if self.piece_check(p2_copy, p2.copy()):
                 print("--^^--")
-                return self.Tolerance(p1, p2.copy())
+                np = self.Tolerance(p1.copy(), p2.copy())
+                if np != False:
+                    if self.calc_check(p1.copy(), p2.copy(), np.copy()):
+                        print("**^^**")
+                        return np
+                    return False
             else:
                 print("--「変形」--")
                 return False
@@ -246,7 +251,7 @@ class paking_program:
         np_area = self.calc_area(np)
 
         if pp_area <= np_area:
-            if pp_area * 1.3 >= np_area:
+            if pp_area * 1.3 >= np_area:    #多角形近似をした際に誤差が生じる可能性がある
                 return True
         else:
             return False
@@ -675,7 +680,7 @@ if __name__ == "__main__":
     pa.piece_data_backup = []
     checkFlag = True
     # 統合
-    loop = 10   #ループの回数
+    loop = 100   #ループの回数
     while nagasa != loop:  # ループ回数管理
         nagasa += 1
         totalArea = pa.calc_totalArea(pa.poly_row)
