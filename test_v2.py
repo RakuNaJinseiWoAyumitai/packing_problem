@@ -461,18 +461,18 @@ class paking_program:
         # print("cie",cie)
         return new_list
 
-    def Tolerance(self, poly1, poly2):
+    def Tolerance(self, poly1, poly2):  #多角形近似
         over_v = []  # くっついている点
-        over_num = []
-        add_list = []
-        delete_list = []
+        over_num = []   # くっついている点の配列での順番を残している
+        add_list = []   # poly1(多角形)に対して追加する点の配列
+        delete_list = []    # poly1(多角形)に対して削除する点の配列
         flag = False
         flag2 = False
         delete = False
         # print(poly1,poly2)
         for i in range(len(poly1)):
             for j in range(len(poly2)):
-                if poly1[i] == poly2[j]:
+                if poly1[i] == poly2[j]:    # 同じ座標であれば，くっついている場所(座標と順番)を保存
                     over_v.append(poly2[j])
                     over_num.append([i, j])
                     # print(poly1[i])
@@ -550,7 +550,11 @@ class paking_program:
         flag_stop = True
         while (flag_stop):
             for i in range(len(poly1)):
+                if len(poly1) < 3:  #統合結果が多角形でないとき
+                    print("頂点の数が３つ未満")
+                    return False
                 if i == 0:
+                    # print("よくエラーが生じるとこ", poly1)
                     if (poly1[len(poly1) - 1][0] == poly1[i][0] and poly1[i + 1][0] == poly1[i][0]) or (
                             poly1[len(poly1) - 1][1] == poly1[i][1] and poly1[i + 1][1] == poly1[i][1]):
                         del poly1[i]
@@ -680,7 +684,7 @@ if __name__ == "__main__":
     pa.piece_data_backup = []
     checkFlag = True
     # 統合
-    loop = 100   #ループの回数
+    loop = 10   #ループの回数
     while nagasa != loop:  # ループ回数管理
         nagasa += 1
         totalArea = pa.calc_totalArea(pa.poly_row)
